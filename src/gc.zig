@@ -5,8 +5,12 @@ const mem = std.mem;
 const Allocator = std.mem.Allocator;
 
 const gc = @cImport({
-    @cInclude("gc.h");
+    @cInclude("gc/gc.h");
+    @cInclude("gc/gc_mark.h");
+    @cInclude("gc/gc_typed.h");
 });
+
+pub const c = gc;
 
 /// Returns the Allocator used for APIs in Zig
 pub fn allocator() Allocator {

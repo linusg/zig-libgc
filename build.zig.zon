@@ -1,0 +1,17 @@
+.{
+    .name = "zig-libgc",
+    .version = "0.1.0",
+    .dependencies = .{
+        .libgc = .{
+            .url = "https://codeberg.org/linusg/zig-build-libgc/archive/674f8d8cc216bb87f43319c2c819a6e8fa9c210f.tar.gz",
+            .hash = "12205e49f52adfc172f67db1458bbae503ccc5f05a54e1b16a4489a342c78d376a07",
+        },
+    },
+    .paths = .{
+        "LICENSE",
+        "README.md",
+        "build.zig",
+        "build.zig.zon",
+        "src/",
+    },
+}

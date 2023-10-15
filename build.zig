@@ -4,37 +4,10 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    // libgc
-    const gc = b.addStaticLibrary(.{
-        .name = "gc",
+    const libgc = b.dependency("libgc", .{
         .target = target,
         .optimize = optimize,
     });
-    {
-        // TODO(mitchellh): support more complex features that are usually on
-        // with libgc like threading, parallelization, etc.
-        const cflags = [_][]const u8{};
-        const libgc_srcs = [_][]const u8{
-            "alloc.c",    "reclaim.c", "allchblk.c", "misc.c",     "mach_dep.c", "os_dep.c",
-            "mark_rts.c", "headers.c", "mark.c",     "obj_map.c",  "blacklst.c", "finalize.c",
-            "new_hblk.c", "dbg_mlc.c", "malloc.c",   "dyn_load.c", "typd_mlc.c", "ptr_chck.c",
-            "mallocx.c",
-        };
-
-        gc.linkLibC();
-
-        if (target.isDarwin()) {
-            gc.linkFramework("Foundation");
-        }
-
-        gc.addIncludePath("vendor/bdwgc/include");
-        inline for (libgc_srcs) |src| {
-            gc.addCSourceFile("vendor/bdwgc/" ++ src, &cflags);
-        }
-
-        const gc_step = b.step("libgc", "build libgc");
-        gc_step.dependOn(&gc.step);
-    }
 
     // lib for zig
     const lib = b.addStaticLibrary(.{
@@ -43,15 +16,15 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    lib.linkLibrary(libgc.artifact("gc"));
+    lib.installLibraryHeaders(libgc.artifact("gc"));
     {
         var main_tests = b.addTest(.{
             .root_source_file = .{ .path = "src/gc.zig" },
             .target = target,
             .optimize = optimize,
         });
-        main_tests.linkLibC();
-        main_tests.addIncludePath("vendor/bdwgc/include");
-        main_tests.linkLibrary(gc);
+        main_tests.linkLibrary(lib);
 
         const test_step = b.step("test", "Run library tests");
         test_step.dependOn(&main_tests.step);
@@ -60,7 +33,7 @@ pub fn build(b: *std.Build) void {
         b.installArtifact(lib);
     }
 
-    const module = b.createModule(.{
+    const module = b.addModule("gc", .{
         .source_file = .{ .path = "src/gc.zig" },
     });
 
@@ -72,9 +45,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     {
-        exe.linkLibC();
-        exe.addIncludePath("vendor/bdwgc/include");
-        exe.linkLibrary(gc);
+        exe.linkLibrary(lib);
         exe.addModule("gc", module);
         b.installArtifact(exe);
 
