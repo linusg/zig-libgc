@@ -34,8 +34,9 @@ pub fn build(b: *std.Build) void {
     }
 
     const module = b.addModule("gc", .{
-        .source_file = .{ .path = "src/gc.zig" },
+        .root_source_file = .{ .path = "src/gc.zig" },
     });
+    module.linkLibrary(libgc.artifact("gc"));
 
     // example app
     const exe = b.addExecutable(.{
@@ -45,8 +46,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     {
-        exe.linkLibrary(lib);
-        exe.addModule("gc", module);
+        exe.root_module.addImport("gc", module);
         b.installArtifact(exe);
 
         const run_cmd = b.addRunArtifact(exe);

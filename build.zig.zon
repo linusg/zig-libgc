@@ -3,8 +3,8 @@
     .version = "0.1.0",
     .dependencies = .{
         .libgc = .{
-            .url = "https://codeberg.org/linusg/zig-build-libgc/archive/674f8d8cc216bb87f43319c2c819a6e8fa9c210f.tar.gz",
-            .hash = "12205e49f52adfc172f67db1458bbae503ccc5f05a54e1b16a4489a342c78d376a07",
+            .url = "https://codeberg.org/linusg/zig-build-libgc/archive/e70f0ab58ed0929fb125ed48b313bad272656e8f.tar.gz",
+            .hash = "1220bd01fdbbd8bafacb30747485edc1b272112cc5e15e1cc0d0ebafec019308d79c",
         },
     },
     .paths = .{
